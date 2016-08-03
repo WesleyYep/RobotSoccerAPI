@@ -1,5 +1,6 @@
 package api.workers;
 
+import api.data.Point;
 import api.robots.Robots;
 
 /**
@@ -9,13 +10,20 @@ import api.robots.Robots;
  */
 public abstract class Worker {
 
-    private final Robots robots;
+    protected final Robots robots;
+    protected Point ball;
+    protected final Robots opponents;
 
     /**
      * @param robots The robots that the worker should set the position for
      */
-    public Worker(Robots robots) {
+    public Worker(Robots robots, Robots opponents) {
         this.robots = robots;
+        this.opponents = opponents;
+    }
+
+    public Point getBallPosition(){
+        return ball;
     }
 
     /**

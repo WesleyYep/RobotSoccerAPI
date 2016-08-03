@@ -12,7 +12,6 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,8 +34,8 @@ public class VisionWorker extends Worker {
 	private boolean[][] bFound = new boolean[5][100];
 	private int testCount = 0;
 
-    public VisionWorker(VisionParameters vp, Robots robots) {
-		super(robots);
+    public VisionWorker(VisionParameters vp, Robots robots, Robots opponents) {
+		super(robots, opponents);
 		this.visionParameters = vp;
 
 		segmentPosition = new Point[4];
@@ -465,9 +464,10 @@ public class VisionWorker extends Worker {
 					tempCountLoss++;
 				}
 			}
-            //TODO set positions
-			//notifyListeners(new VisionData(robotHome[id].realPos, robotHome[id].direction, "robot:" + (id + 1)));
-    	}
+            //Set team robot positions
+			robots.setPosition(id, robotHome[id].realPos);
+
+		}
 		testCount += 1;
 		if (testCount >= 100) {
 			testCount = 0;
@@ -517,9 +517,8 @@ public class VisionWorker extends Worker {
 			imageBallPosition.y = 0;
 		}
 
-        //TODO send ball position
-		Point ballRealPosition = BoardProperties.imagePosToActualPos(imageBallPosition);
-		//notifyListeners(new VisionData(ballRealPosition, 0, "ball"));
+        //Set ball position
+		ball = BoardProperties.imagePosToActualPos(imageBallPosition);
 	}
 	
 	public void Run_FindOpponent() {
@@ -539,30 +538,12 @@ public class VisionWorker extends Worker {
 			enemyPatchList.get(l).center.x = sumX/enemyPatchList.get(l).pixels.size();
 			enemyPatchList.get(l).center.y = sumY/enemyPatchList.get(l).pixels.size();
 
-            //TODO set opponent positions
-			//notifyListeners(new VisionData(new Point(enemyPatchList.get(l).center.x, enemyPatchList.get(l).center.y), 0, "opponent:" + count));
+            //Set opponent positions
+			opponents.setPosition(l, new Point(enemyPatchList.get(l).center.x, enemyPatchList.get(l).center.y));
+
 			//count++;
 			if (count > 5) count = 5;
 		}
 	}
 
-	public ArrayList<Patch> getTeamPatchList() {
-		return teamPatchList;
-	}
-
-	public ArrayList<Patch> getEnemyPatchList() {
-		return enemyPatchList;
-	}
-	public ArrayList<Point> getSegmentPointList() { return segmentPointList; }
-
-//	public void notifyListeners(VisionData visionData) {
-//		for (VisionListener l : listeners) {
-//			l.receive(visionData);
-//		}
-//	}
-//
-//	public void addListeners(VisionListener l ) {
-//		listeners.add(l);
-//	}
-    
 }
